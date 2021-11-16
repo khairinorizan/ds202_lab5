@@ -175,10 +175,127 @@ pre code {
 <div id="question-1" class="section level2">
 <h2>Question 1</h2>
 <p>Create a data frame containing the persons who are fatally hurt in the accidents (see FARS manual and look up variable <code>INJ_SEV</code>)</p>
+<pre class="r"><code>fatallyInjuredPerson &lt;- person %&gt;% filter(INJ_SEV == 4)
+
+head(fatallyInjuredPerson, 10)</code></pre>
+<pre><code>##    STATE ST_CASE VE_FORMS VEH_NO PER_NO STR_VEH COUNTY DAY MONTH HOUR MINUTE
+## 1      1   10001        1      1      1       0     73  19     2   23     35
+## 2      1   10002        1      1      1       0     89  14     2   14     59
+## 3      1   10003        3      2      1       0    101  31     1   20     31
+## 4      1   10004        1      1      1       0     73   1     1   16     55
+## 5      1   10005        1      1      1       0     13   1     1   20      0
+## 6      1   10006        2      1      1       0     49   6     1   18     40
+## 7      1   10007        2      1      1       0     73  11     1   17     57
+## 8      1   10008        1      1      1       0      3  11     1   16     50
+## 9      1   10009        1      1      1       0     87  11     1   14     30
+## 10     1   10011        2      1      1       0     87  15     1    4     35
+##    RUR_URB FUNC_SYS HARM_EV MAN_COLL SCH_BUS MAKE MAK_MOD BODY_TYP MOD_YEAR
+## 1        2        1      38        0       0   20   20421       15     2004
+## 2        2        1       1        0       0   37   37402       14     2005
+## 3        2        1      12        1       0    2    2404       14     2003
+## 4        2        4      30        0       0   30   30046        4     2014
+## 5        1        1      35        0       0   12   12471       34     2010
+## 6        1        1      34        0       0   49   49032        4     1997
+## 7        2        1      12        1       0   55   55033        4     2015
+## 8        1        1      35        0       0   20   20002        4     2002
+## 9        1        1      21        0       0   49   49422       15     2006
+## 10       2        1      12        2       0   19   19022        4     2008
+##    TOW_VEH SPEC_USE EMER_USE ROLLOVER IMPACT1 FIRE_EXP AGE SEX PER_TYP INJ_SEV
+## 1        1        0        0        0      12        0  42   1       1       4
+## 2        0        0        0        9       0        0  43   1       1       4
+## 3        0        0        0        0       6        0  47   1       1       4
+## 4        0        0        0        1      11        0  18   1       1       4
+## 5        0        0        0        1      12        0  67   2       1       4
+## 6        0        0        0        1      11        0  18   2       1       4
+## 7        0        0        0        0       6        0  26   2       1       4
+## 8        0        0        0        2      12        0  81   1       1       4
+## 9        0        0        0        0      12        1  18   1       1       4
+## 10       0        0        0        0      12        0  65   1       1       4
+##    SEAT_POS REST_USE REST_MIS AIR_BAG EJECTION EJ_PATH EXTRICAT DRINKING
+## 1        11       20        0       1        1       9        0        0
+## 2        11        3        0       8        0       0        0        9
+## 3        11        3        0      99        0       0        0        0
+## 4        11        3        0       8        0       0        0        9
+## 5        11        3        0       1        0       0        0        0
+## 6        11       20        0      20        1       9        0        0
+## 7        11       99        0      20        0       0        0        0
+## 8        11        3        0      20        0       0        1        0
+## 9        11       20        0      99        0       0        0        9
+## 10       11        3        0       8        0       0        0        9
+##    ALC_DET ALC_STATUS ATST_TYP ALC_RES DRUGS DRUG_DET DSTATUS DRUGTST1 DRUGTST2
+## 1        9          0        0     996     0        8       0        0        0
+## 2        9          2        1       0     9        8       2        1        1
+## 3        9          2        1       0     0        8       2        1        0
+## 4        9          0        0     996     9        8       0        0        0
+## 5        9          0        0     996     0        8       0        0        0
+## 6        9          0        0     996     0        8       0        0        0
+## 7        9          0        0     996     0        8       0        0        0
+## 8        9          0        0     996     0        8       0        0        0
+## 9        9          2        1       0     9        8       2        1        1
+## 10       9          2        1       0     9        8       2        1        0
+##    DRUGTST3 DRUGRES1 DRUGRES2 DRUGRES3 HOSPITAL DOA DEATH_DA DEATH_MO DEATH_YR
+## 1         0        0        0        0        0   7       19        2     2017
+## 2         1      605      600      996        0   7       14        2     2017
+## 3         0        1        0        0        0   7       31        1     2017
+## 4         0        0        0        0        0   7        1        1     2017
+## 5         0        0        0        0        0   7        1        1     2017
+## 6         0        0        0        0        0   7        6        1     2017
+## 7         0        0        0        0        0   7       11        1     2017
+## 8         0        0        0        0        1   0       11        1     2017
+## 9         0      605      600        0        0   7       11        1     2017
+## 10        0      996        0        0        0   7       15        1     2017
+##    DEATH_HR DEATH_MN DEATH_TM LAG_HRS LAG_MINS P_SF1 P_SF2 P_SF3 WORK_INJ
+## 1        23       35     2335       0        0     0     0     0        0
+## 2        14       59     1459       0        0     0     0     0        0
+## 3        20       31     2031       0        0     0     0     0        0
+## 4        16       55     1655       0        0     0     0     0        0
+## 5        20        0     2000       0        0     0     0     0        0
+## 6        18       40     1840       0        0     0     0     0        0
+## 7        17       57     1757       0        0     0     0     0        0
+## 8        19       18     1918       2       28     0     0     0        0
+## 9        14       30     1430       0        0     0     0     0        0
+## 10        4       35      435       0        0     0     0     0        0
+##    HISPANIC RACE LOCATION
+## 1         7    1        0
+## 2         7    1        0
+## 3         7    2        0
+## 4         7    2        0
+## 5         7    1        0
+## 6         7    1        0
+## 7         7    2        0
+## 8         7    1        0
+## 9         7    1        0
+## 10        7    1        0</code></pre>
 </div>
 <div id="question-2" class="section level2">
 <h2>Question 2</h2>
 <p>Create a data frame containing the most dangerous vehicle make in each state. The number of persons fatally hit in the vehicle make is used to assess the non-safety of a make. Make sure to handle the missing values appropriately. (look up variable <code>MAKE</code>)</p>
+<pre class="r"><code># MAKE, STATE, PER_NO, PER_TYPE
+# PER_TYPE; 1 = Driver of a Motor Vehicle in Transport, 2 = Passenger of a Motor Vehicle in Transport
+
+dangerousVehicleByState &lt;- fatallyInjuredPerson %&gt;% 
+                            filter(PER_TYP %in% c(1,2)) %&gt;% 
+                            select(STATE, PER_NO, MAKE, PER_TYP, INJ_SEV) %&gt;% 
+                            group_by(STATE, MAKE) %&gt;% 
+                            summarize(TotalPersonFatallyHit = sum(PER_NO, na.rm = TRUE)) %&gt;% 
+                            slice(which.max(TotalPersonFatallyHit))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;STATE&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>print(dangerousVehicleByState)</code></pre>
+<pre><code>## # A tibble: 51 × 3
+## # Groups:   STATE [51]
+##    STATE  MAKE TotalPersonFatallyHit
+##    &lt;int&gt; &lt;int&gt;                 &lt;int&gt;
+##  1     1    12                   188
+##  2     2    20                    12
+##  3     4    20                   137
+##  4     5    20                   113
+##  5     6    49                   469
+##  6     8    20                    96
+##  7     9    37                    34
+##  8    10    12                    14
+##  9    11    42                     8
+## 10    12    12                   312
+## # … with 41 more rows</code></pre>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
