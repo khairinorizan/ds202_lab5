@@ -43,12 +43,39 @@ print(dangerousVehicleByState)
 
 ## Question 3
 Create a map, and label each state with the most dangerous vehicle. Discuss the definition of the most dangerous vehicle, and what you find from the map. (Hint: Read the description for the `STATE` and `COUNTY` columns in the FARS manual. The state & county codes are Geographic Locator Codes (GLCs) from the General Services Administration's (GSA) publication. Use `readxl::read_xlsx` to read in the GLCs.)
+```{r}
+states <- map_data("state")
+
+joinedDf <- dangerousVehicleByState %>% left_join(states, by=c("STATE" = "group"))
+
+groupedJoinedDf <- joinedDf %>% group_by(STATE, MAKE) %>% summarize(long=mean(long), lat=mean(lat))
+
+states %>% ggplot(aes(x = long, y = lat)) + 
+  geom_polygon(aes(group = group)) +
+  geom_text(aes(label=MAKE), color='white', data=groupedJoinedDf)
+```
 
 ## Question 4
 Join the accident and person table (work out which variable(s) to use)
+```{r}
+personAccident <- person %>% inner_join(accident, by='ST_CASE')
+```
 
 ## Question 5
 Tally the number of accidents by day of the week (`DAY_WEEK`), hour of the day (`HOUR`) and gender (`SEX`). Visualize the results and explain what you find.
+```{r}
+dayWeek <- personAccident %>% group_by(DAY_WEEK) %>% count() %>% rename(CasesCount = n)
+hour <- personAccident %>% group_by(HOUR.x) %>% count() %>% rename(CasesCount = n)
+sex <- personAccident %>% group_by(SEX) %>% count() %>% rename(CasesCount = n)
+
+print(sex)
+```
 
 ## Question 6
 Now plot a choropleth map of the number of deaths on a county level. Also explain what you find. 
+```{r}
+deathCountyLevel <- person %>% filter(INJ_SEV == 6) %>% group_by(COUNTY) %>% summarize(n())
+
+deathCountyLevel
+```
+/
