@@ -70,43 +70,72 @@ personAccident <- person %>% inner_join(accident, by='ST_CASE')
 ## Question 5
 Tally the number of accidents by day of the week (`DAY_WEEK`), hour of the day (`HOUR`) and gender (`SEX`). Visualize the results and explain what you find.
 ```{r,  message=FALSE}
-dayWeek <- personAccident %>% group_by(DAY_WEEK, HOUR.x, SEX) %>% summarize(CasesCount = n())
+# geom_bar
+dayWeek <- personAccident %>% group_by(DAY_WEEK) %>% summarize(CasesCount = n())
+# geom_line
+hour <- personAccident %>% filter(HOUR.x != 99) %>% group_by(HOUR.x) %>% summarize(CasesCount = n())
+# geom_bar
+sex <- personAccident %>% filter(SEX %in% c(1,2)) %>% group_by(SEX) %>% summarize(CasesCount = n())
 
-dayWeek
-# hour <- personAccident %>% group_by(HOUR.x) %>% count() %>% rename(CasesCount = n)
-# sex <- personAccident %>% group_by(SEX) %>% count() %>% rename(CasesCount = n)
-
-# print(sex)
+ggplot(dayWeek, aes(x=DAY_WEEK, y=CasesCount, fill = DAY_WEEK)) + 
+  geom_bar(stat = "identity") + 
+  theme(text = element_text(size=10), axis.text.x = element_text(angle = 90, hjust=1)) + 
+  labs(y = "Cases Count", x = "Day of the Week")
 ```
+\
+**Day of the Week vs Cases Count** \
+From the barplot Day of the Week vs Cases Count, we can see an upward trend from Wednesday to Saturday. Apart from that, we can also see that Saturday has the most number of accident cases and Wednesday has the lowest number of accident cases.
+
+```{r, message=FALSE}
+ggplot(hour) +
+  geom_line(aes(x=HOUR.x, y=CasesCount)) + 
+  labs(y = "Cases Count", x = "Hour")
+```
+\
+**Hour vs Cases Count** \
+From the line graph Hour vs Cases Count, we can see an upward trend from 7 AM to 5 PM, however, the trend goes down after 5 PM. This can be explained by the busy traffic hours. Apart from that, we can also see that highest number of accident cases happened around 4 PM, which consist of more than 5000 cases.
+
+```{r, message=FALSE}
+ggplot(sex, aes(x=SEX, y=CasesCount)) + 
+  geom_bar(stat = "identity") + 
+  theme(text = element_text(size=10), axis.text.x = element_text(angle = 90, hjust=1)) + 
+  labs(y = "Cases Count", x = "Sex")
+```
+ \
+**Sex vs Cases Count** \
+From the bar chart shown above, we can see that the male has more accident cases than the female. The male has over 40000 accident cases compared to woman which consist only around 25000 accident cases.
 
 ## Question 6
 Now plot a choropleth map of the number of deaths on a county level. Also explain what you find. 
 ```{r,  message=FALSE}
-# deathCountyLevel <- person %>% filter(INJ_SEV == 4) %>% group_by(STATE, COUNTY) %>% summarize(`Death Count` = n())
 deathCountyLevel <- personAccident %>% 
                     filter(INJ_SEV == 4) %>% 
                     group_by(STATE.x, COUNTY.x) %>% 
-                    summarize(long = mean(LONGITUD), lat = mean(LATITUDE), `Death Count` = sum(DOA, na.rm = TRUE)) %>% 
-                    rename(state = STATE.x, county = COUNTY.x)
+                    summarize(`Death Count` = n()) %>% 
+                    rename(state = STATE.x, county = COUNTY.x) %>% 
+                    mutate(state = as.character(state), county = as.character(county))
 
-deathCountyLevelJoined <- deathCountyLevel %>% inner_join(states, by=c("state" = "group"))
+count_county <- map_data("county") %>% 
+                  mutate(subregion = toupper(subregion), region = toupper(region)) %>% 
+                  left_join(glc %>% 
+                            select(`County Code`, `County Name`, `State Name`, `State Code`) %>% 
+                            distinct, by = c(subregion = 'County Name', region = 'State Name')) %>% 
+                  left_join(deathCountyLevel %>% 
+                            mutate(county = as.character(county)), 
+                            by = c(`County Code` = 'county', `State Code` = 'state'))
 
-groupedJoinedDf <- deathCountyLevelJoined %>% 
-                    group_by(state, county) %>% 
-                    summarize(countylong = mean(long.x), countyLat = mean(lat.x), stateLong = mean(long.y), stateLat = mean(lat.y), `Death Count` = mean(`Death Count`))
+map <- count_county %>% 
+        ggplot(aes(x = long, y = lat)) + 
+        geom_polygon(aes(fill = `Death Count`, group = group)) + 
+        theme_nothing(legend = TRUE) + 
+        coord_map() + 
+        scale_fill_viridis(option = "magma", direction = -1)
 
 
+map2 <- map + scale_fill_gradient2(low = "yellow", high = "red", na.value = "lightgrey",)
 
-# states %>% ggplot(aes(x = long, y = lat)) + 
-#             geom_polygon(aes(group = group)) +
-#             geom_text(aes(label=Make), color='white', data=groupedJoinedDf)
-
-groupedJoinedDf %>% ggplot(aes(x = stateLong, y = stateLat)) + geom_polygon(aes(fill = `Death Count`, x = countylong, y = countyLat, group = state)) + theme_nothing(legend = TRUE) + coord_map() + scale_fill_viridis(option = "magma", direction = -1)
-
-# ggplot() + geom_polygon(data = groupedJoinedDf, aes(fill = `Death Count`,
-#                                     x = stateLong,
-#                                     y = stateLat,
-#                                     group = state)) + theme_nothing(legend = TRUE) + coord_map() + scale_fill_viridis(option = "magma", direction = -1)
+map2
 
 ```
-/
+\
+From the choropleth map, south-east US region has more death compared to the other region. Midwest region on the other hand, has a lower number of death cases, where for the most part has a "NA" record. Overall, there have not been a lot of death cases looking at county level. However, cumulatively, the number of death accident cases in the United States are worrying. 
